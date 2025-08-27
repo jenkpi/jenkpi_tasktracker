@@ -2,7 +2,7 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-ENV PYTHONPATH=app/src
+ENV PYTHONPATH=src
 
 COPY ./src /app/src
 COPY requirements.txt /app
