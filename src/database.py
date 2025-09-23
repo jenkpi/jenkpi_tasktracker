@@ -1,25 +1,16 @@
-from typing import Optional
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-engine = create_async_engine("sqlite+aiosqlite:///tasks.db")
+from models.task_models import Base
+
+
+engine = create_async_engine("postgresql+asyncpg://postgres:password@localhost:5432/tasks")
 
 new_session = async_sessionmaker(engine)
 
-class Base(DeclarativeBase):
-    pass
 
-class TaskOrm(Base):
-    __tablename__ = "tasks"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    task: Mapped[str]
-    description: Mapped[Optional[str]]
-
-
-async def delete_tables():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+# async def delete_tables():
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.drop_all)
 
 
 async def create_tables():
