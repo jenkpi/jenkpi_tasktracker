@@ -1,19 +1,18 @@
-from typing import Annotated
-
-from fastapi import Depends
-from repository.repository import TaskRepository
+from repository.repository import TaskAbstractRepository
 from schemas.task_schemas import TaskAdd, TaskEdit
 
-class TaskService():
-    async def add_one(self, task: Annotated[TaskAdd, Depends()]):
-        task_id = await TaskRepository.add_task(task)
+
+class TaskService:
+    def __init__(self, task_repo: TaskAbstractRepository):
+        self.task_repo = task_repo
+
+    async def add_one(self, task: TaskAdd):
+        task_id = await self.task_repo.add_task(task)
         return {"ok": True, "task_id": task_id}
-    
 
     async def get_all(self):
-        tasks = await TaskRepository.find_all()
+        tasks = await self.task_repo.find_all()
         return tasks
-    
-    
+
     async def edit_task(self, task_id: int, changes: TaskEdit):
-        return await TaskRepository.edit_task(task_id, changes)
+        return await self.task_repo.edit_task(task_id, changes)

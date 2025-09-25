@@ -1,6 +1,6 @@
-from typing import Optional
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from datetime import datetime
+
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
@@ -12,8 +12,8 @@ class TaskOrm(Base):
 
     task_id: Mapped[int] = mapped_column(primary_key=True)
     task: Mapped[str]
-    description: Mapped[Optional[str]]
+    description: Mapped[str | None]
     user_id: Mapped[int]
     status: Mapped[str]
-    deadline: Mapped[Optional[datetime]]
+    deadline: Mapped[datetime | None]
     # как сделать выбор в поле из неск вариантов

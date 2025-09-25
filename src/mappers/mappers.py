@@ -1,5 +1,5 @@
-from models.task_models import TaskOrm
 from schemas.task_schemas import TaskAdd, TaskEdit, TaskOut
+from sqlalchemy_orm_models.sqlalchemy_orm_task_models import TaskOrm
 
 
 def build_task_orm_model(data: TaskAdd | TaskEdit) -> TaskOrm:
@@ -9,7 +9,10 @@ def build_task_orm_model(data: TaskAdd | TaskEdit) -> TaskOrm:
 
 
 def build_task_schemas(task_models: list[TaskOrm]):
-    task_schemas = [TaskOut.model_validate(task_model, from_attributes=True) for task_model in task_models]
+    task_schemas = [
+        TaskOut.model_validate(task_model, from_attributes=True)
+        for task_model in task_models
+    ]
     return task_schemas
 
 
