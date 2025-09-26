@@ -14,20 +14,20 @@ from sqlalchemy_orm_models.sqlalchemy_orm_task_models import TaskOrm
 
 class TaskAbstractRepository(Protocol):
     @classmethod
-    async def add_task(cls, data: TaskAdd) -> int: ...
+    async def add_task(cls, task_data: TaskAdd) -> int: ...
 
     @classmethod
     async def find_all(cls) -> list[TaskOut]: ...
 
     @classmethod
-    async def edit_task(cls, task_id: int, changes: TaskEdit) -> TaskOut: ...
+    async def edit_task(cls, task_id: int, changes: TaskEdit) -> list[TaskOut]: ...
 
 
 class TaskRepository:
     @classmethod
-    async def add_task(cls, data: TaskAdd) -> int:
+    async def add_task(cls, task_data: TaskAdd) -> int:
         async with new_session() as session:
-            task = build_task_orm_model(data)  # валидация модели
+            task = build_task_orm_model(task_data)  # валидация модели
 
             session.add(task)
             await session.flush()
@@ -41,24 +41,18 @@ class TaskRepository:
         async with new_session() as session:
             query = select(TaskOrm)
 
-            result = await session.execute(query)
+            res = await session.execute(query)
 
-            task_models = result.scalars().all()
+            task_models = res.scalars().all()
             return build_task_schemas(task_models)
 
     @classmethod
-    async def edit_task(cls, task_id: int, changes: TaskEdit) -> TaskOut:
+    async def edit_task(cls, task_id: int, changes: TaskEdit) -> list[TaskOut]:
         async with new_session() as session:
             task_dict = build_dict_from_schemas(changes)
-            query = (
-                update(TaskOrm)
-                .where(TaskOrm.task_id == task_id)
-                .values(**task_dict)
-                .returning(TaskOrm)
-            )
+            query = update(TaskOrm).where(TaskOrm.task_id == task_id).values(**task_dict).returning(TaskOrm)  # noqa:WPS221
 
-            result = await session.execute(query)
-            task_model = result.scalars().all()
+            task_model = (await session.execute(query)).scalars().all()
 
             task_schema = build_task_schemas(task_model)
             await session.commit()

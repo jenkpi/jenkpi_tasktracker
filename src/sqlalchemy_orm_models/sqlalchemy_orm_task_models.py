@@ -4,7 +4,12 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
-    pass
+    """
+    Базовый класс для ORM-моделей SQLAlchemy.
+
+    Используется как точка входа для декларативного стиля описания таблиц.
+    Все ORM-модели приложения должны наследоваться от этого класса.
+    """
 
 
 class TaskOrm(Base):

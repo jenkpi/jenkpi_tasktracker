@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     port: int
     database: str
 
-    def get_url_string(self) -> str:
+    def get_url_string(self) -> URL:
         # settings = Settings(_env_prefix="PG_")
         url_string = URL.create(
             "postgresql+asyncpg",
