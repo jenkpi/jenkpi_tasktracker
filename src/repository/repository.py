@@ -6,26 +6,22 @@ from database import new_session
 from mappers.mappers import (
     build_dict_from_schemas,
     build_task_orm_model,
-    build_task_schemas,
+    build_task_schemas_from_orm,
 )
-from schemas.task_schemas import TaskAdd, TaskEdit, TaskOut
+from schemas.task_schemas import GetAllTasksResponse, PostTaskRequest, EditTaskRequest, TaskFull
 from sqlalchemy_orm_models.sqlalchemy_orm_task_models import TaskOrm
 
 
 class TaskAbstractRepository(Protocol):
-    @classmethod
-    async def add_task(cls, task_data: TaskAdd) -> int: ...
+    async def add_task(self, task_data: PostTaskRequest) -> int: ...
 
-    @classmethod
-    async def find_all(cls) -> list[TaskOut]: ...
+    async def get_all_tasks(self) -> GetAllTasksResponse: ...
 
-    @classmethod
-    async def edit_task(cls, task_id: int, changes: TaskEdit) -> list[TaskOut]: ...
+    async def edit_task(self, task_id: int, changes: EditTaskRequest) -> GetAllTasksResponse: ...
 
 
 class TaskRepository:
-    @classmethod
-    async def add_task(cls, task_data: TaskAdd) -> int:
+    async def add_task(self, task_data: PostTaskRequest) -> int:
         async with new_session() as session:
             task = build_task_orm_model(task_data)  # валидация модели
 
@@ -36,24 +32,23 @@ class TaskRepository:
 
             return task_id
 
-    @classmethod
-    async def find_all(cls) -> list[TaskOut]:
+    async def get_all_tasks(self) -> GetAllTasksResponse:
         async with new_session() as session:
             query = select(TaskOrm)
 
             res = await session.execute(query)
 
             task_models = res.scalars().all()
-            return build_task_schemas(task_models)
+            return build_task_schemas_from_orm(task_models)
 
-    @classmethod
-    async def edit_task(cls, task_id: int, changes: TaskEdit) -> list[TaskOut]:
+
+    async def edit_task(self, task_id: int, changes: EditTaskRequest) -> GetAllTasksResponse:
         async with new_session() as session:
             task_dict = build_dict_from_schemas(changes)
             query = update(TaskOrm).where(TaskOrm.task_id == task_id).values(**task_dict).returning(TaskOrm)  # noqa:WPS221
 
             task_model = (await session.execute(query)).scalars().all()
 
-            task_schema = build_task_schemas(task_model)
+            task_schema = build_task_schemas_from_orm(task_model)
             await session.commit()
             return task_schema

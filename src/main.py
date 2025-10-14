@@ -11,5 +11,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(lifespan=lifespan)
-app.include_router(task_router)
+def get_app() -> FastAPI:
+    app = FastAPI(lifespan=lifespan)
+    app.include_router(task_router)
+    return app

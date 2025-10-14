@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
-class TaskAdd(BaseModel):
+class PostTaskRequest(BaseModel):
     task: str
     description: str | None = None
     user_id: int
@@ -11,12 +11,19 @@ class TaskAdd(BaseModel):
     deadline: datetime | None = None
 
 
-class TaskOut(TaskAdd):
+class TaskFull(PostTaskRequest):
     task_id: int
-    # model_config = {"from_attributes": True}
 
 
-class TaskEdit(BaseModel):
+class GetAllTasksResponse(BaseModel):
+    tasks: list[TaskFull]
+
+
+class PostTaskResponse(BaseModel):
+    task_id: int
+
+
+class EditTaskRequest(BaseModel):
     task: str | None = None
     description: str | None = None
     user_id: int | None = None
