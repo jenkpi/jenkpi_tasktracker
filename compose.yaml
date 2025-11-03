@@ -1,0 +1,11 @@
+services:
+  
+  db: # Define the database service
+    image: postgres # Use the official PostgreSQL image
+    restart: always
+    environment:
+      POSTGRES_DB: tasks
+      POSTGRES_USER: jane
+      POSTGRES_PASSWORD: pass
+    ports:
+      - 5432:5432

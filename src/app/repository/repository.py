@@ -2,14 +2,14 @@ from typing import Protocol
 
 from sqlalchemy import select, update
 
-from database import new_session
-from mappers.mappers import (
+from app.database import new_session
+from app.mappers.mappers import (
     build_dict_from_schemas,
     build_task_orm_model,
     build_task_schemas_from_orm,
 )
-from schemas.task_schemas import GetAllTasksResponse, PostTaskRequest, EditTaskRequest, TaskFull
-from sqlalchemy_orm_models.sqlalchemy_orm_task_models import TaskOrm
+from app.schemas.task_schemas import EditTaskRequest, GetAllTasksResponse, PostTaskRequest, TaskFull
+from app.sqlalchemy_orm_models.sqlalchemy_orm_task_models import TaskOrm
 
 
 class TaskAbstractRepository(Protocol):
@@ -17,7 +17,7 @@ class TaskAbstractRepository(Protocol):
 
     async def get_all_tasks(self) -> GetAllTasksResponse: ...
 
-    async def edit_task(self, task_id: int, changes: EditTaskRequest) -> GetAllTasksResponse: ...
+    async def edit_task(self, task_id: int, changes: EditTaskRequest) -> TaskFull: ...
 
 
 class TaskRepository:
@@ -41,8 +41,7 @@ class TaskRepository:
             task_models = res.scalars().all()
             return build_task_schemas_from_orm(task_models)
 
-
-    async def edit_task(self, task_id: int, changes: EditTaskRequest) -> GetAllTasksResponse:
+    async def edit_task(self, task_id: int, changes: EditTaskRequest) -> TaskFull:
         async with new_session() as session:
             task_dict = build_dict_from_schemas(changes)
             query = update(TaskOrm).where(TaskOrm.task_id == task_id).values(**task_dict).returning(TaskOrm)  # noqa:WPS221

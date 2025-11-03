@@ -22,5 +22,5 @@ lint:
     flake8 src
     pyright src
 run:
-    PYTHONPATH=src uvicorn main:app --env-file .env
+    PYTHONPATH=src uvicorn app.main:app --env-file .env --host localhost --port 8000
 

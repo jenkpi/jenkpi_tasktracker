@@ -3,13 +3,15 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
 
-from repository.repository import TaskRepository
-from schemas.task_schemas import GetAllTasksResponse, PostTaskRequest, EditTaskRequest, TaskFull
-from services.tasks_services import TaskService
+from app.repository.repository import TaskRepository
+from app.schemas.task_schemas import EditTaskRequest, GetAllTasksResponse, PostTaskRequest, TaskFull
+from app.services.tasks_services import TaskService
+
+from app.kafka.broker import kafka_publisher
 
 router = APIRouter(prefix="/tasks")
 
-task_service = TaskService(task_repo=TaskRepository())
+task_service = TaskService(task_repo=TaskRepository(), publisher=kafka_publisher)
 
 
 def get_task_service() -> TaskService:
@@ -30,5 +32,5 @@ async def get_all_tasks(task_service: TaskServiceDep) -> GetAllTasksResponse:
 
 
 @router.post("/edit_task/{task_id}")
-async def edit_task(task_id: int, changes: EditTaskRequest, task_service: TaskServiceDep) -> GetAllTasksResponse:
+async def edit_task(task_id: int, changes: EditTaskRequest, task_service: TaskServiceDep) -> TaskFull:
     return await task_service.edit_task(task_id, changes)

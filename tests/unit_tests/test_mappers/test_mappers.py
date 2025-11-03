@@ -1,10 +1,9 @@
 from datetime import datetime
 
 import pytest
-from sqlalchemy.inspection import inspect
-
 from mappers.mappers import build_dict_from_schemas, build_task_orm_model, build_task_schemas_from_orm
-from schemas.task_schemas import GetAllTasksResponse, PostTaskRequest, EditTaskRequest, TaskFull
+from schemas.task_schemas import EditTaskRequest, GetAllTasksResponse, PostTaskRequest, TaskFull
+from sqlalchemy.inspection import inspect
 from sqlalchemy_orm_models.sqlalchemy_orm_task_models import TaskOrm
 
 

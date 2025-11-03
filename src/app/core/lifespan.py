@@ -3,15 +3,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from routers.task_routers import router as task_router
+from app.kafka.broker import broker
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    await broker.start()
     yield
-
-
-def get_app() -> FastAPI:
-    app = FastAPI(lifespan=lifespan)
-    app.include_router(task_router)
-    return app

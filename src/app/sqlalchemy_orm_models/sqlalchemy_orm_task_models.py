@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import TIMESTAMP
 
 
 class Base(DeclarativeBase):
@@ -20,5 +21,5 @@ class TaskOrm(Base):
     description: Mapped[str | None]
     user_id: Mapped[int]
     status: Mapped[str]
-    deadline: Mapped[datetime | None]
+    deadline: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True))
     # как сделать выбор в поле из неск вариантов
